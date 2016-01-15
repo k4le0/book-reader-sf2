@@ -7,3 +7,11 @@ services:
 #    service_name:
 #        class: AppBundle\Directory\ClassName
 #        arguments: ["@another_service_name", "plain_value", "%parameter_name%"]
+    book_shelf:
+        class: Jkan\BookReader\Infrastructure\InMemoryBookShelf
+
+    book_reader:
+        class: Jkan\BookReader\Application\BookService
+        arguments:
+            - '@book_shelf'
+

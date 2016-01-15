@@ -48,8 +48,7 @@ class DefaultController extends Controller
 
     public function readBookAction(Request $request)
     {
-        $bookShelf = new InMemoryBookShelf();
-        $bookService = new BookService($bookShelf);
+        $bookService = $this->get('book_reader');
 
         return $this->render(
             'default/book_content.html.twig',
