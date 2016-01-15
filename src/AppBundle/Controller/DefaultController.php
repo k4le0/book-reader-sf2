@@ -6,6 +6,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Jkan\BookReader\Application\BookService;
 use Jkan\BookReader\Infrastructure\InMemoryBookShelf;
 
@@ -24,13 +25,29 @@ class DefaultController extends Controller
 
     public function myNameAction(Request $request)
     {
-
         return new Response('it Works');
+    }
+
+    public function greetAction()
+    {
+        $session = $this->get('session');
+        $name = $session->get('my_name');
+
+        return new Response(sprintf('Hello my master %s', $name));
+    }
+
+    public function changeNameAction(Request $request)
+    {
+        $session = $this->get('session');
+        $session->set('my_name', $request->get('name'));
+
+        return new RedirectResponse(
+            $this->get('router')->generate('my_name')
+        );
     }
 
     public function readBookAction(Request $request)
     {
-        
         $bookShelf = new InMemoryBookShelf();
         $bookService = new BookService($bookShelf);
 

@@ -3,9 +3,19 @@ app:
     type:     annotation
 
 my_name:
-    path: /name/kuba
+    path: /
     defaults:
         _controller: AppBundle:Default:index
+
+greet:
+    path: /greet
+    defaults:
+        _controller: AppBundle:Default:greet
+
+change_name:
+    path: /change-name/{name}
+    defaults:
+        _controller: AppBundle:Default:changeName
 
 it_works:
     path: /it/it_works
