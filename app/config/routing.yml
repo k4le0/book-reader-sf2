@@ -2,6 +2,16 @@ app:
     resource: "@AppBundle/Controller/"
     type:     annotation
 
+do_payment:
+    path: /do/payment
+    defaults:
+        _controller: AppBundle:Default:doPayment
+
+confirm_payment:
+    path: /reservation/confirm
+    defaults:
+        _controller: AppBundle:Default:confirm
+
 my_name:
     path: /name/kuba
     defaults:
