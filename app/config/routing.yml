@@ -2,6 +2,10 @@ app:
     resource: "@AppBundle/Controller/"
     type:     annotation
 
+display_product:
+    path: /product/{id}
+    defaults:
+        _controller: AppBundle:Default:displayProduct
 do_payment:
     path: /do/payment
     defaults:

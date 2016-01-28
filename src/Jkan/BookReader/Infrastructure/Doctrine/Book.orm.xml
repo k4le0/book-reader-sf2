@@ -5,6 +5,6 @@
         http://doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
 
     <entity name="Jkan\BookReader\Domain\Book" table="books">
-        <id name="title" type="string"/>
+        <id name="title" type="string" />
     </entity>
 </doctrine-mapping>

@@ -2,6 +2,7 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\Entity\Product;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
@@ -17,10 +18,31 @@ class DefaultController extends Controller
      */
     public function indexAction(Request $request)
     {
+        $product = new Product('Mój Produkt 3');
+
+        $em = $this->getDoctrine()->getManager();
+        $em->persist($product);
+
+        $product = new Product('Mój Produkt 4');
+        $em->persist($product);
+
+        $em->flush();
+
+
         // replace this example code with whatever you need
         return $this->render('default/index.html.twig', array(
             'base_dir' => realpath($this->container->getParameter('kernel.root_dir').'/..'),
         ));
+    }
+
+    public function displayProductAction(Request $request)
+    {
+        $em = $this->getDoctrine()->getManager();
+        $repository = $em->getRepository('AppBundle\Entity\Product');
+
+        $product = $repository->find($request->get('id'));
+
+        return new Response('Product: '. $product->name());
     }
 
     public function doPaymentAction()
@@ -36,7 +58,7 @@ class DefaultController extends Controller
             &email=jakub.kanclerz@gmail.com
         */
         $params = array(
-            'id' => '725630',
+            'id' => $this->getParameter('dotpay_id'),
             'amount' => '156',
             'description' => 'Zapłata za uslugę',
             'control' => 'Z-15-01-2016',
@@ -56,7 +78,7 @@ class DefaultController extends Controller
 
     public function confirmPaymentAction(Request $request)  
     {
-        $pin = 'un9Cqip3gQXSmcjVbdGm2ycqSrKsGTE2';
+        $pin = $this->getParameter('dotpay_pin');
         $params = [
             $pin,
             $request->request->get('id'),
