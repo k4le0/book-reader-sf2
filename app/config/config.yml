@@ -37,15 +37,12 @@ twig:
     strict_variables: "%kernel.debug%"
 
 # Doctrine Configuration
+# app/config/config.yml
 doctrine:
     dbal:
-        driver:   pdo_mysql
-        host:     "%database_host%"
-        port:     "%database_port%"
-        dbname:   "%database_name%"
-        user:     "%database_user%"
-        password: "%database_password%"
-        charset:  UTF8
+        driver: pdo_sqlite
+        path: '%kernel.root_dir%/sqlite.db'
+        charset: UTF8
         # if using pdo_sqlite as your database driver:
         #   1. add the path in parameters.yml
         #     e.g. database_path: "%kernel.root_dir%/data/data.db3"
@@ -57,6 +54,13 @@ doctrine:
         auto_generate_proxy_classes: "%kernel.debug%"
         naming_strategy: doctrine.orm.naming_strategy.underscore
         auto_mapping: true
+        mappings:
+            BookReader:
+                is_bundle: false
+                type: xml
+                prefix: Jkan\BookReader\Domain
+                dir: %kernel.root_dir%/../src/Jkan/BookReader/Infrastructure/Doctrine
+                alias: BookReader
 
 # Swiftmailer Configuration
 swiftmailer:
