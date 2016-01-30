@@ -2,7 +2,12 @@
 
 namespace AppBundle\Controller;
 
+use Jkan\BookStore\Domain\Exception\StoreException;
+use Jkan\BookStore\Infrastructure\Payment\DotpayCompletePayment;
+use Jkan\BookStore\Infrastructure\Payment\DotpayPaymentFactory;
 use AppBundle\Entity\Product;
+use Jkan\BookCanonicalModel\OrderIdentifier;
+use Jkan\BookStore\Application\BookBuying;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
@@ -18,15 +23,26 @@ class DefaultController extends Controller
      */
     public function indexAction(Request $request)
     {
-        $product = new Product('Mój Produkt 3');
+        $product = new Product('Biały Miś');
+        $product->increaseSupply();
+        $product->increaseSupply();
 
         $em = $this->getDoctrine()->getManager();
         $em->persist($product);
 
-        $product = new Product('Mój Produkt 4');
+        $product = new Product('Czarny Kot');
+        $product->increaseSupply();
+        $product->increaseSupply();
+        $product->increaseSupply();
+        $product->increaseSupply();
+
         $em->persist($product);
 
+
         $em->flush();
+
+        // $product = new Product('Mój Produkt 4');
+        // $em->persist($product);
 
 
         // replace this example code with whatever you need
@@ -45,7 +61,7 @@ class DefaultController extends Controller
         return new Response('Product: '. $product->name());
     }
 
-    public function doPaymentAction()
+    public function doPaymentAction(Request $request)
     {
         /*
             https://ssl.dotpay.pl/test_payment/?
@@ -65,6 +81,8 @@ class DefaultController extends Controller
             'firstname' => 'Jakub',
             'lastname' => 'Kanclerz',
             'email' => 'jakub.kanclerz@gmail.com',
+            'type' => 1,
+            'api_version' => 'dev',
         );
 
         $url = sprintf(
@@ -78,51 +96,24 @@ class DefaultController extends Controller
 
     public function confirmPaymentAction(Request $request)  
     {
-        $pin = $this->getParameter('dotpay_pin');
-        $params = [
-            $pin,
-            $request->request->get('id'),
-            $request->request->get('operation_number'),
-            $request->request->get('operation_type'),
-            $request->request->get('operation_status'),
-            $request->request->get('operation_amount'),
-            $request->request->get('operation_currency'),
-            $request->request->get('operation_withdrawal_amount'),
-            $request->request->get('operation_commission_amount'),
-            $request->request->get('operation_original_amount'),
-            $request->request->get('operation_original_currency'),
-            $request->request->get('operation_datetime'),
-            $request->request->get('operation_related_number'),
-            $request->request->get('control'),
-            $request->request->get('description'),
-            $request->request->get('email'),
-            $request->request->get('p_info'),
-            $request->request->get('p_email'),
-            $request->request->get('channel'),
-            $request->request->get('channel_country'),
-            $request->request->get('geoip_country'),
-        ];
-        
-        $concated = implode('', $params);
+        $dotpayPaymentFactory = new DotpayPaymentFactory();
+        $bookBuying = new BookBuying();
 
-        $signature = hash('sha256', $concated);
+        try {
+            $bookBuying->completePurchase(
+                new OrderIdentifier($request->get('control')),
+                $dotpayPaymentFactory->createPayment(
+                    new DotpayCompletePayment(
+                        $request->request->all(),
+                        $this->getParameter('dotpay_pin')
+                    )
+                )
+            );
 
-        $logger = $this->get('logger');
-
-        $logger->notice('URLC------------------------------------------'.
-            var_export($request->request, true)
-        );
-
-        $hash = $request->get('md5');
-        if ($signature === $hash) {
-            //confirm order
-            //do sth
-            //book dates etc.
-            //change state of system
             return new Response('OK');
+        } catch (StoreException $e) {
+            return new Response('FAIL');
         }
-
-        return new Response('FAIL');
     }
 
     public function myNameAction(Request $request)

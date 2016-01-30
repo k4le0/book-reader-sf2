@@ -17,5 +17,6 @@ parameters:
 
     # A secret key that's used to generate certain security-related tokens
     secret:            ThisTokenIsNotSoSecretChangeIt
-    dotpay_id: my_id
-    dotpay_pin: my_secret_pin
+    dotpya_id: your_dotpay_id
+    dotpay_pin: your_dotpay_pin
+
